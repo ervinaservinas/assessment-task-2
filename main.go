@@ -8,13 +8,12 @@ import (
 )
 
 type NameInfo struct {
-	Name        string 
-	CountryID   string  
-	Probability float64 
+	Name        string
+	CountryID   string
+	Probability float64
 }
 
 var db sync.Map // in-memory
-
 
 func addNameToDB(name string) {
 	resp, err := http.Get(fmt.Sprintf("https://api.nationalize.io?name=%s", name))
@@ -38,7 +37,6 @@ func addNameToDB(name string) {
 		return
 	}
 
-	
 	var nameInfo []NameInfo
 	for _, c := range data.Country {
 		nameInfo = append(nameInfo, NameInfo{
@@ -48,12 +46,11 @@ func addNameToDB(name string) {
 		})
 	}
 
-	
 	db.Store(name, nameInfo)
 }
 
 func getMinMaxProbabilities(name string) (string, string) {
-	
+
 	nameInfo, ok := db.Load(name)
 	if !ok {
 		addNameToDB(name)
@@ -81,7 +78,7 @@ func getMinMaxProbabilities(name string) (string, string) {
 }
 
 func main() {
-	names := []string{"Joey", "Aljosja", "Ervinas"}
+	names := []string{"Joey", "Aljosja", "Ervinas", "Yeojin", "Fredrik"}
 
 	for _, name := range names {
 		addNameToDB(name)
