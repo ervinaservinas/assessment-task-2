@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"strings"
 	"sync"
 )
 
@@ -78,14 +81,50 @@ func getMinMaxProbabilities(name string) (string, string) {
 }
 
 func main() {
-	names := []string{"Joey", "Aljosja", "Ervinas", "Yeojin", "Fredrik"}
+	reader := bufio.NewReader(os.Stdin)
 
-	for _, name := range names {
-		addNameToDB(name)
-	}
-	for _, name := range names {
-		minCountry, maxCountry := getMinMaxProbabilities(name)
-		fmt.Printf("Name: %s, Min Probability Country: %s, Max Probability Country: %s\n", name, minCountry, maxCountry)
+	for {
+		fmt.Println("\n=== Name Nationality Probability Checker ===")
+		fmt.Println("1. Check a single name")
+		fmt.Println("2. Check multiple names")
+		fmt.Println("3. Exit")
+		fmt.Print("Choose an option (1-3): ")
 
+		choice, _ := reader.ReadString('\n')
+		choice = strings.TrimSpace(choice)
+
+		switch choice {
+		case "1":
+			fmt.Print("Enter a name: ")
+			name, _ := reader.ReadString('\n')
+			name = strings.TrimSpace(name)
+
+			addNameToDB(name)
+			minCountry, maxCountry := getMinMaxProbabilities(name)
+			fmt.Printf("\nResults for %s:\n", name)
+			fmt.Printf("Most likely country: %s\n", maxCountry)
+			fmt.Printf("Least likely country: %s\n", minCountry)
+
+		case "2":
+			fmt.Print("Enter names (separated by spaces): ")
+			namesInput, _ := reader.ReadString('\n')
+			namesInput = strings.TrimSpace(namesInput)
+			names := strings.Split(namesInput, " ")
+
+			for _, name := range names {
+				addNameToDB(name)
+				minCountry, maxCountry := getMinMaxProbabilities(name)
+				fmt.Printf("\nResults for %s:\n", name)
+				fmt.Printf("Most likely country: %s\n", maxCountry)
+				fmt.Printf("Least likely country: %s\n", minCountry)
+			}
+
+		case "3":
+			fmt.Println("Goodbye!")
+			return
+
+		default:
+			fmt.Println("Invalid option. Please try again.")
+		}
 	}
 }
